@@ -1,0 +1,218 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conquist House CRM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/dashboard.css" />
+</head>
+<body class="home-screen">
+  <main class="entry-shell">
+    <section class="entry-hero container">
+      <section class="entry-copy" data-aos="fade-right">
+        <div class="entry-brand">
+          <span class="eyebrow">Ambiente comercial restrito</span>
+          <div class="logo-wrap">
+            <img src="assets/logo.svg" alt="Conquist House" />
+            <h1>Conquisty House CRM</h1>
+          </div>
+          <p class="hero-description">
+           
+          </p>
+        </div>
+
+        <div class="entry-highlights" data-aos="fade-up" data-aos-delay="120">
+          <article class="entry-highlight">
+            <span>Experiência</span>
+            <strong>Painel comercial com leitura executiva e relatorio diário.</strong>
+          </article>
+          <article class="entry-highlight">
+            <span>Segurança</span>
+            <strong>Acesso autenticado por perfil com entrada restrita por corretor.</strong>
+          </article>
+          <article class="entry-highlight">
+            <span>Operação</span>
+            <strong>Fluxo conectado a métricas, alertas, leads e exportação em PDF.</strong>
+          </article>
+        </div>
+
+        <p class="entry-note">
+          Cada perfil abre um recorte próprio do pipeline. A gestão acompanha a operação consolidada, enquanto os corretores entram diretamente na carteira individual.
+        </p>
+      </section>
+
+      <section class="entry-access card" data-aos="fade-left">
+        <div class="access-header">
+          <span class="badge badge-soft">Acesso autenticado</span>
+          <h1>Selecione o perfil para abrir o painel comercial.</h1>
+          </div>
+
+        <div class="broker-grid" id="brokerGrid"></div>
+        <div id="authNotice" class="auth-notice" role="status" aria-live="polite"></div>
+        <p class="system-footer mono">v1.1 · uso interno Conquist House</p>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal fade auth-modal" id="passwordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow mb-0">Autenticação</span>
+            <h5 class="modal-title">Acesso do corretor</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="auth-modal-meta">
+            <p class="auth-modal-copy">Digite a senha vinculada ao perfil selecionado para abrir o dashboard com os dados correspondentes.</p>
+            <strong id="selectedBrokerName"></strong>
+          </div>
+          <input id="brokerPasswordInput" type="password" class="form-control input" placeholder="Senha de acesso" />
+          <div id="passwordError" class="auth-notice d-none mt-2">Senha inválida. Tente novamente.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-accent" data-bs-dismiss="modal">Cancelar</button>
+          <button id="confirmPasswordBtn" type="button" class="btn btn-primary">Entrar no CRM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const brokers = [
+      { nome: "Renata", gid: "0", role: "owner" },
+      { nome: "Josias", gid: "", role: "owner" },
+      { nome: "Alisom", gid: "1008269842", role: "broker" },
+      { nome: "Gisele", gid: "1275092515", role: "broker" },
+      { nome: "Juliane", gid: "579721872", role: "broker" },
+      { nome: "Kener", gid: "1749185015", role: "broker" },
+      { nome: "Clovis", gid: "748444197", role: "broker" },
+      { nome: "Thaize", gid: "494514812", role: "broker" },
+      { nome: "Tiago", gid: "812270182", role: "broker" },
+      { nome: "Carla", gid: "", role: "broker" }
+    ];
+
+    const brokerPasswords = {
+      renata: "YgsB320",
+      alisom: "Kp9Tq441",
+      gisele: "Mx7Rz913",
+      juliane: "Qv2Lm580",
+      kener: "Hb4Nx762",
+      clovis: "Tr8Wp135",
+      thaize: "Ns6Df904",
+      tiago: "Lc3Jy827",
+      carla: "Pm5Ka246",
+      josias: "010377"
+    };
+
+    const roleCopy = {
+      owner: {
+        role: "Gestão"
+      },
+      broker: {
+        role: "Corretor"
+      }
+    };
+
+    const authNotice = document.getElementById("authNotice");
+    const search = new URLSearchParams(window.location.search);
+    if (search.get("auth") === "required") {
+      authNotice.textContent = "Faça login com a senha do corretor para acessar o dashboard.";
+    }
+
+    const grid = document.getElementById("brokerGrid");
+    let selectedBroker = null;
+    const modalEl = document.getElementById("passwordModal");
+    const modal = new bootstrap.Modal(modalEl);
+    const selectedBrokerName = document.getElementById("selectedBrokerName");
+    const passwordInput = document.getElementById("brokerPasswordInput");
+    const passwordError = document.getElementById("passwordError");
+    const confirmBtn = document.getElementById("confirmPasswordBtn");
+
+    grid.innerHTML = brokers.map((broker, index) => {
+      const copy = roleCopy[broker.role] || roleCopy.broker;
+      return `
+        <article class="broker-card" data-aos="fade-up" data-aos-delay="${80 + (index * 35)}">
+          <div class="broker-card-top">
+            <div class="avatar">${broker.nome.slice(0, 1).toUpperCase()}</div>
+            <span class="broker-role">${copy.role}</span>
+          </div>
+          <div>
+            <strong class="broker-name d-block">${broker.nome}</strong>
+          </div>
+          <div class="broker-card-bottom">
+            <button class="btn btn-primary js-broker-link" data-nome="${broker.nome}" data-role="${broker.role}" data-gid="${broker.gid || ""}" type="button">
+              Entrar
+              <i class="ph ph-arrow-up-right"></i>
+            </button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    grid.querySelectorAll(".js-broker-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        selectedBroker = {
+          nome: link.dataset.nome,
+          role: link.dataset.role || "broker",
+          gid: link.dataset.gid || ""
+        };
+        selectedBrokerName.textContent = selectedBroker.nome;
+        passwordInput.value = "";
+        passwordError.classList.add("d-none");
+        modal.show();
+        setTimeout(() => passwordInput.focus(), 150);
+      });
+    });
+
+    const validateAccess = () => {
+      if (!selectedBroker) return;
+      const key = selectedBroker.nome.toLowerCase();
+      const expected = brokerPasswords[key];
+      const typed = passwordInput.value;
+      if (!expected || typed !== expected) {
+        passwordError.classList.remove("d-none");
+        return;
+      }
+      sessionStorage.setItem("conquist_auth", JSON.stringify({
+        corretor: selectedBroker.nome,
+        role: selectedBroker.role,
+        expiresAt: Date.now() + (1000 * 60 * 60 * 12)
+      }));
+      if (selectedBroker.role === "owner") {
+        window.location.href = `dashboard.html?view=owner&corretor=${encodeURIComponent(selectedBroker.nome)}`;
+        return;
+      }
+      window.location.href = `dashboard.html?corretor=${encodeURIComponent(selectedBroker.nome)}&gid=${encodeURIComponent(selectedBroker.gid)}`;
+    };
+
+    confirmBtn.addEventListener("click", validateAccess);
+    passwordInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") validateAccess();
+    });
+
+    AOS.init({
+      duration: 450,
+      easing: "ease-out",
+      once: true,
+      offset: 20
+    });
+  </script>
+</body>
+</html>

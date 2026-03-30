@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Conquist House CRM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/dashboard.css" />
+</head>
+<body class="dashboard-screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <div class="brand-mark">
+          <img src="assets/logo.svg" alt="Conquist House" />
+        </div>
+        <div class="brand-copy">
+          <span class="brand-overline">Conquist House</span>
+          <strong>CRM Comercial Premium</strong>
+        </div>
+        <div class="topbar-context">
+          <span id="corretorBadge" class="badge corretor-nome">Ativo</span>
+          <div class="context-meta">
+            <span class="context-label">Workspace</span>
+            <span>Operação, inteligência e gestão</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <span id="updatedAt" class="updated-chip mono"></span>
+        <a id="btnSheet" class="btn btn-outline-accent" href="#" target="_blank" rel="noopener noreferrer" hidden>
+          <i class="ph ph-table"></i>
+          Planilha
+        </a>
+        <a class="btn btn-outline-accent" href="index.html">
+          <i class="ph ph-arrow-left"></i>
+          Trocar corretor
+        </a>
+        <button id="btnExport" class="btn btn-primary" type="button">
+          <i class="ph ph-file-pdf"></i>
+          Exportar PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="pdfTarget" class="page">
+    <section id="stateBox" class="card state-shell" data-aos="fade-up">
+      <div class="skeleton" style="height: 26px; width: 220px;"></div>
+      <div class="skeleton" style="height: 14px; width: min(460px, 72%);"></div>
+      <div class="skeleton" style="height: 14px; width: min(320px, 54%);"></div>
+    </section>
+
+    <section id="dashboardContent" class="dashboard-stack" hidden>
+      <section class="executive-hero card" data-aos="fade-up">
+        <div>
+          <span class="eyebrow">Resumo executivo</span>
+          <div class="executive-heading">
+            <div>
+              <h1 id="heroTitle">Panorama comercial</h1>
+              <p id="heroSubtitle">Leitura consolidada da operação com foco em progresso, gargalos e oportunidades acionáveis.</p>
+            </div>
+            <div class="hero-updated">
+              <span>Última atualização</span>
+              <strong id="heroUpdatedAt">--</strong>
+            </div>
+          </div>
+          <div id="heroHighlights" class="hero-highlights"></div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="hero-spotlight">
+            <span class="spotlight-label">Termômetro comercial</span>
+            <strong id="heroSpotlightValue" class="mono">--</strong>
+            <p id="heroSpotlightText">Resumo estratégico da carteira atual.</p>
+          </div>
+          <div class="hero-side-grid">
+            <article>
+              <span>Leads ativos</span>
+              <strong id="heroLeadCount" class="mono">0</strong>
+            </article>
+            <article>
+              <span>Etapa dominante</span>
+              <strong id="heroMomentum" class="mono">--</strong>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section id="ownerPanel" class="owner-panel section" hidden data-aos="fade-up">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">Gestão comercial</span>
+            <h3>Painel consolidado do time</h3>
+          </div>
+        </div>
+        <p class="section-subtitle">Filtre a operação por corretor, período ou etapa para comparar desempenho, concentração de leads e ritmo de fechamento.</p>
+        <div class="owner-filters">
+          <select id="ownerCorretorSelect" class="select">
+            <option value="">Todos os corretores</option>
+          </select>
+          <select id="ownerPeriodoSelect" class="select">
+            <option value="">Período completo</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 180 dias</option>
+          </select>
+          <select id="ownerStatusSelect" class="select">
+            <option value="">Todas as etapas</option>
+            <option value="Lead">Lead</option>
+            <option value="Contato">Contato</option>
+            <option value="Visita">Visita</option>
+            <option value="Proposta">Proposta</option>
+            <option value="Venda">Venda</option>
+            <option value="Perdido">Perdido</option>
+          </select>
+          <button id="ownerResetBtn" class="btn btn-outline-accent" type="button">Limpar filtros</button>
+        </div>
+        <div id="ownerSummary" class="owner-summary"></div>
+      </section>
+
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <section id="primaryCluster" class="cluster-primary">
+        <section class="section card" data-aos="fade-up">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Performance comercial</span>
+              <h2>Funil e conversões</h2>
+              <p class="section-subtitle">Uma leitura central do avanço do pipeline, com destaque para gargalos e eficiência de passagem entre etapas.</p>
+            </div>
+            <div id="funnelSummary" class="section-chip mono">--</div>
+          </div>
+
+          <div class="feature-grid">
+            <div class="panel-surface">
+              <div class="panel-caption">
+                <span>Etapas do funil</span>
+                <strong id="funnelFocus">--</strong>
+              </div>
+              <div class="chart-wrap chart-wrap--tall">
+                <canvas id="funnelChart"></canvas>
+              </div>
+            </div>
+
+            <div class="panel-surface">
+              <div class="panel-caption">
+                <span>Conversões críticas</span>
+                <strong id="conversionFocus">--</strong>
+              </div>
+              <div class="progress-list" id="conversionList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="ownerRankingSection" class="section card ranking-section" hidden data-aos="fade-up">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Comparativo</span>
+              <h2>Ranking de corretores</h2>
+            </div>
+          </div>
+          <p class="section-subtitle">Leitura rápida do volume, das vendas e da eficiência de conversão em toda a equipe.</p>
+          <div class="table-shell">
+            <table class="owner-ranking-table">
+              <thead>
+                <tr>
+                  <th>Corretor</th>
+                  <th>Total leads</th>
+                  <th>Vendas</th>
+                  <th>Conversão</th>
+                  <th>Ticket médio</th>
+                </tr>
+              </thead>
+              <tbody id="ownerRankingBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="analytics-grid">
+        <section class="section card" data-aos="fade-up">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Aquisição</span>
+              <h2>Origem dos leads</h2>
+            </div>
+            <div id="originHighlight" class="section-chip mono">--</div>
+          </div>
+          <p class="section-subtitle">Mix de canais para entender onde a carteira está sendo abastecida e quais origens concentram mais volume.</p>
+          <div class="panel-surface">
+            <div class="chart-wrap">
+              <canvas id="origemChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="section card" data-aos="fade-up" data-aos-delay="60">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Ritmo</span>
+              <h2>Leads por mês</h2>
+            </div>
+            <div id="monthHighlight" class="section-chip mono">--</div>
+          </div>
+          <p class="section-subtitle">Evolução do volume ao longo do tempo para leitura de cadência comercial e aceleração de entrada.</p>
+          <div class="panel-surface">
+            <div class="chart-wrap">
+              <canvas id="mesChart"></canvas>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="section card" data-aos="fade-up">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">Qualidade de follow-up</span>
+            <h2>Status dos contatos</h2>
+          </div>
+          <div id="statusHighlight" class="section-chip mono">--</div>
+        </div>
+        <p class="section-subtitle">Distribuição das situações registradas no contato para facilitar leitura de maturidade e pendências do relacionamento comercial.</p>
+        <div class="panel-surface">
+          <div class="chart-wrap">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="section card leads-section" data-aos="fade-up">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Operação detalhada</span>
+            <h2>Tabela de leads</h2>
+            <p class="section-subtitle">Um CRM mais legível para varrer a carteira, aplicar filtros, identificar calor de oportunidade e localizar rapidamente os casos prioritários.</p>
+          </div>
+          <div class="table-summary">
+            <article>
+              <span>Registros visíveis</span>
+              <strong id="tableVisibleCount" class="mono">--</strong>
+            </article>
+            <article>
+              <span>Volume filtrado</span>
+              <strong id="tableVolumeValue" class="mono">--</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="filters">
+          <label class="filter-field">
+            <span>Busca</span>
+            <input id="searchInput" class="input" placeholder="Buscar cliente ou imóvel" />
+          </label>
+          <label class="filter-field">
+            <span>Status</span>
+            <select id="statusFilter" class="select"><option value="">Status</option></select>
+          </label>
+          <label class="filter-field">
+            <span>Origem</span>
+            <select id="origemFilter" class="select"><option value="">Origem</option></select>
+          </label>
+          <label class="filter-field" id="corretorFilterWrap" hidden>
+            <span>Corretor</span>
+            <select id="corretorFilter" class="select"><option value="">Corretor</option></select>
+          </label>
+          <label class="filter-field">
+            <span>Valor mínimo</span>
+            <input id="minValor" class="input" type="number" min="0" placeholder="Valor mín." />
+          </label>
+          <label class="filter-field">
+            <span>Valor máximo</span>
+            <input id="maxValor" class="input" type="number" min="0" placeholder="Valor máx." />
+          </label>
+        </div>
+
+        <div class="table-shell">
+          <table class="table leads-table align-middle">
+            <thead>
+              <tr>
+                <th data-sort="cliente">Cliente</th>
+                <th data-sort="imovel">Imóvel</th>
+                <th data-sort="dataLead">Data do lead</th>
+                <th data-sort="origemLead">Origem</th>
+                <th>Status atual</th>
+                <th data-sort="valorImovel">Valor do imóvel</th>
+                <th data-sort="statusContato">Situação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <div class="pagination-meta">
+            <label for="perPage">Itens por página</label>
+            <select id="perPage" class="select" style="width: 96px;">
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <button id="prevPage" class="btn btn-outline-accent" type="button">Anterior</button>
+            <span id="pageInfo" class="mono"></span>
+            <button id="nextPage" class="btn btn-outline-accent" type="button">Próxima</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { fetchCorretorData, prepararDados, temContato, temVisita, temProposta, isSim, isNao, calcularStatus } from "./js/api.js";
+    import { renderCharts } from "./js/charts.js";
+    import { createTableController } from "./js/table.js";
+    import { exportDashboardPDF } from "./js/export.js";
+
+    const OWNER_USERS = new Set(["renata", "josias"]);
+    const TEAM_BROKERS = ["Renata", "Alisom", "Gisele", "Juliane", "Kener", "Clovis", "Thaize", "Tiago", "Carla"];
+    const SHEET_URLS = {
+      renata: "https://docs.google.com/spreadsheets/d/1tHgwYV3Icx4px0mUL44IvMgyQIMTTFT6xSbxXRG_dfY/edit?usp=sharing",
+      alisom: "https://docs.google.com/spreadsheets/d/1bSTV3d7Ha12Yix8mRuAm2Aro8O85Yy3GyvojUAuwHJg/edit?usp=sharing",
+      gisele: "https://docs.google.com/spreadsheets/d/1qxPvaSfhhZ1Q5ut8llaMbexd8ukhSI4Cp2mbmqXW4DQ/edit?usp=sharing",
+      juliane: "https://docs.google.com/spreadsheets/d/1i9FrHVrbzBUqcQ0cjP4zULOM3Guhy1FiHN7M18wu_m4/edit?usp=sharing",
+      kener: "https://docs.google.com/spreadsheets/d/1aNpPHHoCcXXO6AeTzOYxgu2ZXBWCE6t22N2p6jqikZI/edit?usp=sharing",
+      clovis: "https://docs.google.com/spreadsheets/d/1MDBPQ9AdS9pNFdhpaoQp2sXOIRB79_2leiqnhOqIrXk/edit?usp=sharing",
+      thaize: "https://docs.google.com/spreadsheets/d/1F1E-zN5Mc9oENMLsVD_Esiha2m_MWQ7Wst32pJRd8Yg/edit?usp=sharing",
+      tiago: "https://docs.google.com/spreadsheets/d/1g7KsgRPRWr23c09d-HuuqHxNoRTzxRMCrWPJWXv9AZo/edit?usp=sharing",
+      carla: "https://docs.google.com/spreadsheets/d/1OtBK2panrcPuHgPubn5as39enBB4b9xuLKyHfCm5H24/edit?usp=sharing"
+    };
+
+    const params = new URLSearchParams(location.search);
+    const corretor = params.get("corretor") || "Corretor";
+    const view = params.get("view") || "broker";
+    const authRaw = sessionStorage.getItem("conquist_auth");
+    const corretorFilterEl = document.getElementById("corretorFilter");
+    const corretorFilterWrap = document.getElementById("corretorFilterWrap");
+    const isOwnerView = view === "owner";
+
+    const fmtMoeda = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    const fmtNumber = (n) => Number(n || 0).toLocaleString("pt-BR");
+    const formatDateTime = (value) => new Date(value).toLocaleString("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short"
+    });
+
+    const isAuthorized = () => {
+      if (!authRaw) return false;
+      try {
+        const auth = JSON.parse(authRaw);
+        if (!auth || !auth.corretor || !auth.expiresAt) return false;
+        if (Date.now() > Number(auth.expiresAt)) return false;
+        const authCorretor = auth.corretor.toString().toLowerCase();
+        const authRole = auth.role || (OWNER_USERS.has(authCorretor) ? "owner" : "broker");
+        if (isOwnerView) return authRole === "owner";
+        return authCorretor === corretor.toString().toLowerCase();
+      } catch (_) {
+        return false;
+      }
+    };
+
+    if (!isAuthorized()) {
+      window.location.href = "index.html?auth=required";
+    }
+
+    const stateBox = document.getElementById("stateBox");
+    const content = document.getElementById("dashboardContent");
+    const badge = document.getElementById("corretorBadge");
+    const updatedAt = document.getElementById("updatedAt");
+    const heroUpdatedAt = document.getElementById("heroUpdatedAt");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSubtitle = document.getElementById("heroSubtitle");
+    const heroHighlights = document.getElementById("heroHighlights");
+    const heroSpotlightValue = document.getElementById("heroSpotlightValue");
+    const heroSpotlightText = document.getElementById("heroSpotlightText");
+    const heroLeadCount = document.getElementById("heroLeadCount");
+    const heroMomentum = document.getElementById("heroMomentum");
+    const primaryCluster = document.getElementById("primaryCluster");
+    const funnelSummary = document.getElementById("funnelSummary");
+    const funnelFocus = document.getElementById("funnelFocus");
+    const conversionFocus = document.getElementById("conversionFocus");
+    const originHighlight = document.getElementById("originHighlight");
+    const monthHighlight = document.getElementById("monthHighlight");
+    const statusHighlight = document.getElementById("statusHighlight");
+    const kpiGrid = document.getElementById("kpiGrid");
+    const ownerPanel = document.getElementById("ownerPanel");
+    const ownerRankingSection = document.getElementById("ownerRankingSection");
+    const ownerSummary = document.getElementById("ownerSummary");
+    const ownerCorretorSelect = document.getElementById("ownerCorretorSelect");
+    const ownerPeriodoSelect = document.getElementById("ownerPeriodoSelect");
+    const ownerStatusSelect = document.getElementById("ownerStatusSelect");
+    const ownerResetBtn = document.getElementById("ownerResetBtn");
+    const ownerRankingBody = document.getElementById("ownerRankingBody");
+    const btnSheet = document.getElementById("btnSheet");
+
+    const sheetUrl = SHEET_URLS[corretor.toLowerCase()];
+    if (sheetUrl) {
+      btnSheet.href = sheetUrl;
+      btnSheet.hidden = false;
+    } else {
+      btnSheet.hidden = true;
+    }
+
+    let tableController = null;
+
+    const calcKpis = (dados) => {
+      const total = dados.length;
+      const contatos = dados.filter((lead) => temContato(lead)).length;
+      const visitas = dados.filter((lead) => temVisita(lead)).length;
+      const propostas = dados.filter((lead) => temProposta(lead)).length;
+      const vendas = dados.filter((lead) => isSim(lead.teveVenda));
+      const perdidos = dados.filter((lead) => isNao(lead.teveVenda)).length;
+      const ticket = vendas.length ? vendas.reduce((sum, lead) => sum + lead.valorImovel, 0) / vendas.length : 0;
+      const taxaPerda = total ? Number(((perdidos / total) * 100).toFixed(1)) : 0;
+      const taxaVenda = total ? Number(((vendas.length / total) * 100).toFixed(1)) : 0;
+      const carteira = dados.reduce((sum, lead) => sum + Number(lead.valorImovel || 0), 0);
+
+      return {
+        total,
+        contatos,
+        visitas,
+        propostas,
+        vendas: vendas.length,
+        perdidos,
+        ticket,
+        taxaPerda,
+        taxaVenda,
+        carteira
+      };
+    };
+
+    const dominantStatus = (dados) => {
+      const grouped = dados.reduce((acc, lead) => {
+        const key = calcularStatus(lead);
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+      const [status] = Object.entries(grouped).sort((a, b) => b[1] - a[1])[0] || ["Sem dados", 0];
+      return status;
+    };
+
+    const summarizeFunnel = (funnel) => {
+      const steps = [
+        { label: "Lead -> Contato", from: funnel.total, to: funnel.contato },
+        { label: "Contato -> Visita", from: funnel.contato, to: funnel.visita },
+        { label: "Visita -> Proposta", from: funnel.visita, to: funnel.proposta },
+        { label: "Proposta -> Venda", from: funnel.proposta, to: funnel.venda }
+      ];
+      const enriched = steps.map((step) => {
+        const rate = step.from > 0 ? Math.round((step.to / step.from) * 100) : 0;
+        return { ...step, rate };
+      });
+      return {
+        weakest: enriched.slice().sort((a, b) => a.rate - b.rate)[0] || { label: "Sem dados", rate: 0 },
+        strongest: enriched.slice().sort((a, b) => b.rate - a.rate)[0] || { label: "Sem dados", rate: 0 }
+      };
+    };
+
+    const drawHero = ({ dados, kpis, funnel, ownerMode, payload }) => {
+      const momentum = dominantStatus(dados);
+      const funnelSummaryData = summarizeFunnel(funnel);
+      const valorPotencial = kpis.carteira > 0 ? fmtMoeda(kpis.carteira) : "Sem valor";
+
+      heroTitle.textContent = ownerMode
+        ? "Panorama executivo da operação comercial"
+        : `Panorama comercial de ${corretor}`;
+
+      heroSubtitle.textContent = ownerMode
+        ? "Visão consolidada da equipe com leitura de volume, conversão, gargalos e prioridades que pedem ação da gestão."
+        : "Acompanhamento direto da carteira individual com visão clara do funil, do ritmo de atendimento e dos próximos movimentos.";
+
+      heroUpdatedAt.textContent = formatDateTime(payload.atualizadoEm);
+      heroLeadCount.textContent = fmtNumber(kpis.total);
+      heroMomentum.textContent = momentum;
+      heroSpotlightValue.textContent = `${kpis.taxaVenda.toLocaleString("pt-BR")}%`;
+      heroSpotlightText.textContent = kpis.vendas > 0
+        ? `${fmtNumber(kpis.vendas)} fechamento(s) confirmados em ${fmtNumber(kpis.total)} leads, com gargalo principal em ${funnelSummaryData.weakest.label.toLowerCase()}.`
+        : `Nenhuma venda fechada no recorte atual. O ponto mais sensível está em ${funnelSummaryData.weakest.label.toLowerCase()}.`;
+
+      heroHighlights.innerHTML = [
+        {
+          label: ownerMode ? "Carteira consolidada" : "Carteira sob gestão",
+          value: fmtNumber(kpis.total),
+          description: ownerMode ? "leads distribuídos entre a equipe no recorte atual." : "leads acompanhados no recorte selecionado."
+        },
+        {
+          label: "Volume potencial",
+          value: valorPotencial,
+          description: "soma do valor dos imóveis presentes na carteira visível."
+        },
+        {
+          label: "Melhor passagem",
+          value: `${funnelSummaryData.strongest.rate}%`,
+          description: `${funnelSummaryData.strongest.label} é a transição mais eficiente agora.`
+        }
+      ].map((item) => `
+        <article class="hero-highlight">
+          <span>${item.label}</span>
+          <strong class="mono">${item.value}</strong>
+          <p>${item.description}</p>
+        </article>
+      `).join("");
+    };
+
+    const drawKpis = (kpis) => {
+      const cards = [
+        { label: "Total de leads", value: fmtNumber(kpis.total), meta: "volume total da carteira ativa neste recorte.", icon: "ph-users-three", variant: "kpi--hero" },
+        { label: "Contatos realizados", value: fmtNumber(kpis.contatos), meta: "leads já abordados pelo time.", icon: "ph-chat-circle-text", variant: "kpi--compact" },
+        { label: "Visitas realizadas", value: fmtNumber(kpis.visitas), meta: "agendamentos convertidos em visita.", icon: "ph-house-line", variant: "kpi--standard" },
+        { label: "Propostas enviadas", value: fmtNumber(kpis.propostas), meta: "negociações formalizadas até aqui.", icon: "ph-scroll", variant: "kpi--standard" },
+        { label: "Vendas fechadas", value: fmtNumber(kpis.vendas), meta: "fechamentos confirmados neste painel.", icon: "ph-seal-check", variant: "kpi--standard" },
+        { label: "Leads perdidos", value: fmtNumber(kpis.perdidos), meta: "casos marcados como perdidos.", icon: "ph-warning-octagon", variant: "kpi--standard" },
+        { label: "Ticket médio", value: fmtMoeda(kpis.ticket), meta: "valor médio dos imóveis vendidos.", icon: "ph-currency-circle-dollar", variant: "kpi--standard" },
+        { label: "Taxa de perda", value: `${kpis.taxaPerda.toLocaleString("pt-BR")}%`, meta: "percentual da carteira que saiu do funil.", icon: "ph-chart-line-down", variant: "kpi--standard" }
+      ];
+
+      kpiGrid.innerHTML = cards.map((item, index) => `
+        <article class="kpi ${item.variant}" data-aos="fade-up" data-aos-delay="${index * 35}">
+          <div class="kpi__icon"><i class="ph ${item.icon}"></i></div>
+          <div class="kpi-label">${item.label}</div>
+          <div class="kpi-value mono">${item.value}</div>
+          <span class="kpi-meta">${item.meta}</span>
+        </article>
+      `).join("");
+
+      AOS.refreshHard();
+    };
+
+    const drawConversions = (funnel) => {
+      const rows = [
+        ["Lead -> Contato", funnel.total, funnel.contato],
+        ["Contato -> Visita", funnel.contato, funnel.visita],
+        ["Visita -> Proposta", funnel.visita, funnel.proposta],
+        ["Proposta -> Venda", funnel.proposta, funnel.venda]
+      ].map(([label, from, to]) => {
+        const rate = from > 0 ? Math.round((to / from) * 100) : 0;
+        return { label, from, to, rate };
+      });
+
+      document.getElementById("conversionList").innerHTML = rows.map((row) => `
+        <div class="progress-row">
+          <div>
+            <div class="progress-row-label">${row.label}</div>
+            <div class="progress-meta">${fmtNumber(row.to)} de ${fmtNumber(row.from)} oportunidades avançaram</div>
+            <div class="bar" aria-hidden="true"><span style="width:${row.rate}%"></span></div>
+          </div>
+          <strong class="mono">${row.rate}%</strong>
+        </div>
+      `).join("");
+
+      const conversionSummary = summarizeFunnel(funnel);
+      funnelSummary.textContent = `${fmtNumber(funnel.total)} leads no funil · ${fmtNumber(funnel.venda)} vendas`;
+      funnelFocus.textContent = `Gargalo: ${conversionSummary.weakest.label} (${conversionSummary.weakest.rate}%)`;
+      conversionFocus.textContent = `Melhor passagem: ${conversionSummary.strongest.label} (${conversionSummary.strongest.rate}%)`;
+    };
+
+    const drawGraphicHighlights = (metrics) => {
+      originHighlight.textContent = metrics.origin.topLabel
+        ? `${metrics.origin.topLabel} · ${fmtNumber(metrics.origin.topValue)}`
+        : "Sem dados";
+
+      monthHighlight.textContent = metrics.month.topLabel
+        ? `${metrics.month.topLabel} · ${fmtNumber(metrics.month.topValue)} leads`
+        : "Sem dados";
+
+      statusHighlight.textContent = metrics.status.topLabel
+        ? `${metrics.status.topLabel} · ${fmtNumber(metrics.status.topValue)}`
+        : "Sem dados";
+    };
+
+    const showError = () => {
+      stateBox.innerHTML = '<div class="error">Não foi possível carregar os dados agora. <button id="retry" class="btn btn-outline-accent" type="button">Tentar novamente</button></div>';
+      document.getElementById("retry").addEventListener("click", () => location.reload());
+    };
+
+    const loadOwnerDataset = async () => {
+      const settled = await Promise.allSettled(TEAM_BROKERS.map(async (nome) => {
+        const raw = await fetchCorretorData(nome);
+        const payload = prepararDados(raw);
+        const dados = (payload.dados || []).map((lead) => ({ ...lead, corretor: lead.corretor || nome }));
+        return { nome, payload, dados };
+      }));
+
+      const ok = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
+      const dados = ok.flatMap((result) => result.dados);
+      return {
+        corretor: "Relatório Geral",
+        atualizadoEm: new Date().toISOString(),
+        dados
+      };
+    };
+
+    const applyOwnerFilters = (dadosBase) => {
+      const corretorSel = ownerCorretorSelect.value;
+      const periodoSel = Number(ownerPeriodoSelect.value || 0);
+      const statusSel = ownerStatusSelect.value;
+      const hoje = new Date();
+
+      return dadosBase.filter((lead) => {
+        if (corretorSel && lead.corretor !== corretorSel) return false;
+        if (statusSel && calcularStatus(lead) !== statusSel) return false;
+        if (periodoSel > 0) {
+          if (!lead.dataLead) return false;
+          const date = new Date(`${lead.dataLead}T00:00:00`);
+          if (Number.isNaN(date.getTime())) return false;
+          const diff = Math.floor((hoje - date) / (1000 * 60 * 60 * 24));
+          if (diff > periodoSel) return false;
+        }
+        return true;
+      });
+    };
+
+    const drawOwnerSummary = (dados) => {
+      const corretoresAtivos = new Set(dados.map((lead) => lead.corretor).filter(Boolean)).size;
+      const vendas = dados.filter((lead) => isSim(lead.teveVenda)).length;
+      const taxaVenda = dados.length ? ((vendas / dados.length) * 100).toFixed(1) : "0.0";
+      const ticketVals = dados.filter((lead) => isSim(lead.teveVenda) && lead.valorImovel > 0).map((lead) => lead.valorImovel);
+      const ticketMedio = ticketVals.length ? ticketVals.reduce((a, b) => a + b, 0) / ticketVals.length : 0;
+      const mediaLeads = corretoresAtivos ? (dados.length / corretoresAtivos).toFixed(1) : "0.0";
+
+      ownerSummary.innerHTML = [
+        ["Corretores ativos", corretoresAtivos],
+        ["Leads por corretor", mediaLeads],
+        ["Taxa geral de venda", `${taxaVenda}%`],
+        ["Ticket médio geral", fmtMoeda(ticketMedio)]
+      ].map(([label, value]) => `
+        <article class="owner-summary-card">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </article>
+      `).join("");
+    };
+
+    const drawOwnerRanking = (dados) => {
+      const grouped = dados.reduce((acc, lead) => {
+        const key = lead.corretor || "Nao informado";
+        if (!acc[key]) acc[key] = { leads: 0, vendas: 0, valorVendas: 0 };
+        acc[key].leads += 1;
+        if (isSim(lead.teveVenda)) {
+          acc[key].vendas += 1;
+          acc[key].valorVendas += Number(lead.valorImovel || 0);
+        }
+        return acc;
+      }, {});
+
+      const rows = Object.entries(grouped)
+        .map(([nome, data]) => {
+          const conv = data.leads ? ((data.vendas / data.leads) * 100) : 0;
+          const ticket = data.vendas ? data.valorVendas / data.vendas : 0;
+          return { nome, leads: data.leads, vendas: data.vendas, conv, ticket };
+        })
+        .sort((a, b) => b.vendas - a.vendas || b.conv - a.conv);
+
+      ownerRankingBody.innerHTML = rows.map((row) => `
+        <tr>
+          <td>${row.nome}</td>
+          <td class="mono">${fmtNumber(row.leads)}</td>
+          <td class="mono">${fmtNumber(row.vendas)}</td>
+          <td class="mono">${row.conv.toFixed(1)}%</td>
+          <td class="mono">${fmtMoeda(row.ticket)}</td>
+        </tr>
+      `).join("");
+    };
+
+    const mountTable = (dados, ownerMode) => {
+      const refs = {
+        search: document.getElementById("searchInput"),
+        status: document.getElementById("statusFilter"),
+        origem: document.getElementById("origemFilter"),
+        corretor: ownerMode ? corretorFilterEl : null,
+        minValor: document.getElementById("minValor"),
+        maxValor: document.getElementById("maxValor"),
+        tbody: document.getElementById("tableBody"),
+        pageInfo: document.getElementById("pageInfo"),
+        prev: document.getElementById("prevPage"),
+        next: document.getElementById("nextPage"),
+        perPage: document.getElementById("perPage"),
+        headings: [...document.querySelectorAll(".leads-table thead th")],
+        visibleCount: document.getElementById("tableVisibleCount"),
+        volumeValue: document.getElementById("tableVolumeValue")
+      };
+
+      if (!tableController) {
+        tableController = createTableController(dados, refs);
+      } else {
+        tableController.setData(dados);
+      }
+    };
+
+    const renderAll = (dados, ownerMode, payload) => {
+      const kpis = calcKpis(dados);
+      const chartMetrics = renderCharts(dados);
+
+      drawHero({ dados, kpis, funnel: chartMetrics.funnel, ownerMode, payload });
+      drawKpis(kpis);
+      drawConversions(chartMetrics.funnel);
+      drawGraphicHighlights(chartMetrics);
+      mountTable(dados, ownerMode);
+
+      if (ownerMode) {
+        drawOwnerSummary(dados);
+        drawOwnerRanking(dados);
+      }
+    };
+
+    async function init() {
+      try {
+        const payload = isOwnerView ? await loadOwnerDataset() : prepararDados(await fetchCorretorData(corretor));
+        const dados = payload.dados || [];
+
+        if (!dados.length) {
+          stateBox.innerHTML = '<div class="empty">Nenhum lead encontrado para este corretor.</div>';
+          return;
+        }
+
+        if (isOwnerView) {
+          badge.textContent = `${corretor} · Gestão`;
+          corretorFilterWrap.hidden = false;
+          ownerPanel.hidden = false;
+          ownerRankingSection.hidden = false;
+          primaryCluster.classList.remove("cluster-primary--single");
+        } else {
+          badge.textContent = `${corretor} · Ativo`;
+          corretorFilterWrap.hidden = true;
+          ownerPanel.hidden = true;
+          ownerRankingSection.hidden = true;
+          primaryCluster.classList.add("cluster-primary--single");
+        }
+
+        updatedAt.textContent = `Atualizado: ${formatDateTime(payload.atualizadoEm)}`;
+        stateBox.hidden = true;
+        content.hidden = false;
+
+        let activeData = dados;
+        if (isOwnerView) {
+          const corretores = [...new Set(dados.map((lead) => lead.corretor).filter(Boolean))].sort();
+          ownerCorretorSelect.innerHTML = '<option value="">Todos os corretores</option>' + corretores.map((item) => `<option value="${item}">${item}</option>`).join("");
+
+          const rerenderOwner = () => {
+            activeData = applyOwnerFilters(dados);
+            renderAll(activeData, true, payload);
+          };
+
+          [ownerCorretorSelect, ownerPeriodoSelect, ownerStatusSelect].forEach((element) => {
+            element.addEventListener("change", rerenderOwner);
+          });
+
+          ownerResetBtn.addEventListener("click", () => {
+            ownerCorretorSelect.value = "";
+            ownerPeriodoSelect.value = "";
+            ownerStatusSelect.value = "";
+            rerenderOwner();
+          });
+
+          rerenderOwner();
+        } else {
+          renderAll(activeData, false, payload);
+        }
+
+        document.getElementById("btnExport").addEventListener("click", () => exportDashboardPDF({ corretor }));
+      } catch (error) {
+        console.error(error);
+        showError();
+      }
+    }
+
+    AOS.init({
+      duration: 450,
+      easing: "ease-out",
+      once: true,
+      offset: 20
+    });
+
+    init();
+  </script>
+</body>
+</html>
