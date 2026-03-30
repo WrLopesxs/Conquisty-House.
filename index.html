@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conquist House CRM</title>
 
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -19,7 +20,28 @@
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/dashboard.css" />
 </head>
-<body class="home-screen">
+<body class="home-screen splash-active" data-splash-app-name="Conquist House CRM" data-splash-message="Inicializando ambiente comercial...">
+  <div class="app-splash" id="appSplash" role="presentation" aria-hidden="true">
+    <div class="app-splash__backdrop"></div>
+    <div class="app-splash__halo app-splash__halo--left"></div>
+    <div class="app-splash__halo app-splash__halo--right"></div>
+    <div class="app-splash__panel">
+      <div class="app-splash__brand">
+        <div class="app-splash__logo-wrap">
+          <img class="app-splash__logo" src="assets/logo.svg" alt="" />
+        </div>
+        <div class="app-splash__copy">
+          <span class="app-splash__eyebrow">Incializando</span>
+          <strong class="app-splash__title">Conquist House CRM</strong>
+          <p class="app-splash__message">Inicializando ambiente comercial...</p>
+        </div>
+      </div>
+      <div class="app-splash__status" aria-hidden="true">
+        <div class="app-splash__progress"><span></span></div>
+        <span class="app-splash__hint mono"></span>
+      </div>
+    </div>
+  </div>
   <main class="entry-shell">
     <section class="entry-hero container">
       <section class="entry-copy" data-aos="fade-right">
@@ -62,7 +84,7 @@
 
         <div class="broker-grid" id="brokerGrid"></div>
         <div id="authNotice" class="auth-notice" role="status" aria-live="polite"></div>
-        <p class="system-footer mono">v1.1 · uso interno Conquist House</p>
+        <p class="system-footer mono">  uso interno Conquisty House</p>
       </section>
     </section>
   </main>
@@ -94,6 +116,8 @@
   </div>
 
   <script type="module">
+    import { initSplashScreen } from "./js/splash.js";
+
     const brokers = [
       { nome: "Renata", gid: "0", role: "owner" },
       { nome: "Josias", gid: "", role: "owner" },
@@ -132,7 +156,7 @@
     const authNotice = document.getElementById("authNotice");
     const search = new URLSearchParams(window.location.search);
     if (search.get("auth") === "required") {
-      authNotice.textContent = "Faça login com a senha do corretor para acessar o dashboard.";
+      authNotice.textContent = "";
     }
 
     const grid = document.getElementById("brokerGrid");
@@ -205,6 +229,12 @@
     confirmBtn.addEventListener("click", validateAccess);
     passwordInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") validateAccess();
+    });
+
+    initSplashScreen({
+      screenId: "appSplash",
+      minDuration: 1900,
+      fadeDuration: 760
     });
 
     AOS.init({
