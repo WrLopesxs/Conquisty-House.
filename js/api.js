@@ -1,4 +1,4 @@
-﻿const API_BASE = window.CONQUIST_API_BASE || "https://script.google.com/macros/s/AKfycbwQwNfA5MU9GBj_ZO-BpHj4Nw6BZYtgUqqNQN8oPJ9G1cSsEW4RTdkhC9wSk88sRb_z/exec";
+﻿const API_BASE = window.CONQUIST_API_BASE || "https://script.google.com/macros/s/AKfycbyozTubMexHmACI0feDVhbMtbb6myjzmchy3RvEG2dpeYdHArcimtI2gRqXHsF-bynE/exec";
 
 const txt = (v) => (v ?? "").toString().trim();
 const cap = (v) => {
@@ -23,6 +23,10 @@ const toISODate = (v) => {
 };
 
 const toCurrencyNumber = (v) => {
+  if (typeof v === "number") {
+    return Number.isFinite(v) ? v : 0;
+  }
+
   const s = txt(v).replace(/\s/g, "").replace(/^R\$/, "");
   if (!s) return 0;
   if (s.includes(",")) {
@@ -30,7 +34,13 @@ const toCurrencyNumber = (v) => {
     const n = Number(normalized);
     return Number.isFinite(n) ? n : 0;
   }
-  const n = Number(s.replace(/\./g, ""));
+
+  if (/^-?\d{1,3}(?:\.\d{3})+(?:\.\d+)?$/.test(s)) {
+    const n = Number(s.replace(/\.(?=\d{3}(?:\.|$))/g, ""));
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  const n = Number(s);
   return Number.isFinite(n) ? n : 0;
 };
 
@@ -76,6 +86,7 @@ export function normalizarLead(raw = {}) {
     propostaRecebida,
     statusNegociacao,
     valorImovel: toCurrencyNumber(raw.valorImovel),
+    comissao: toCurrencyNumber(raw.comissao ?? raw["comissão"]),
     teveVenda: normalizeYesNo(raw.teveVenda),
     observacoes: txt(raw.observacoes)
   };

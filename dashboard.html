@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard · Conquist House CRM</title>
 
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -29,8 +28,8 @@
           <img src="assets/logo.svg" alt="Conquist House" />
         </div>
         <div class="brand-copy">
-          <span class="brand-overline">Conquist House</span>
-          <strong>CRM Comercial Premium</strong>
+          <span class="brand-overline">Conquisty House</span>
+          <strong>CRM Comercial</strong>
         </div>
         <div class="topbar-context">
           <span id="corretorBadge" class="badge corretor-nome">Ativo</span>
@@ -42,7 +41,7 @@
       </div>
 
       <div class="topbar-right">
-        <span id="updatedAt" class="updated-chip mono"></span>
+        <div id="updatedAt" class="updated-chip"></div>
         <a id="btnSheet" class="btn btn-outline-accent" href="#" target="_blank" rel="noopener noreferrer" hidden>
           <i class="ph ph-table"></i>
           Planilha
@@ -73,33 +72,11 @@
           <div class="executive-heading">
             <div>
               <h1 id="heroTitle">Panorama comercial</h1>
-              <p id="heroSubtitle">Leitura consolidada da operação com foco em progresso, gargalos e oportunidades acionáveis.</p>
-            </div>
-            <div class="hero-updated">
-              <span>Última atualização</span>
-              <strong id="heroUpdatedAt">--</strong>
+              <p id="heroSubtitle"></p>
             </div>
           </div>
           <div id="heroHighlights" class="hero-highlights"></div>
         </div>
-
-        <aside class="hero-side">
-          <div class="hero-spotlight">
-            <span class="spotlight-label">Termômetro comercial</span>
-            <strong id="heroSpotlightValue" class="mono">--</strong>
-            <p id="heroSpotlightText">Resumo estratégico da carteira atual.</p>
-          </div>
-          <div class="hero-side-grid">
-            <article>
-              <span>Leads ativos</span>
-              <strong id="heroLeadCount" class="mono">0</strong>
-            </article>
-            <article>
-              <span>Etapa dominante</span>
-              <strong id="heroMomentum" class="mono">--</strong>
-            </article>
-          </div>
-        </aside>
       </section>
 
       <section id="ownerPanel" class="owner-panel section" hidden data-aos="fade-up">
@@ -109,7 +86,7 @@
             <h3>Painel consolidado do time</h3>
           </div>
         </div>
-        <p class="section-subtitle">Filtre a operação por corretor, período ou etapa para comparar desempenho, concentração de leads e ritmo de fechamento.</p>
+        <p class="section-subtitle">Compare desempenho por corretor, período e etapa.</p>
         <div class="owner-filters">
           <select id="ownerCorretorSelect" class="select">
             <option value="">Todos os corretores</option>
@@ -142,7 +119,7 @@
             <div>
               <span class="eyebrow">Performance comercial</span>
               <h2>Funil e conversões</h2>
-              <p class="section-subtitle">Uma leitura central do avanço do pipeline, com destaque para gargalos e eficiência de passagem entre etapas.</p>
+              <p class="section-subtitle">Avanço do pipeline, gargalos e conversão por etapa.</p>
             </div>
             <div id="funnelSummary" class="section-chip mono">--</div>
           </div>
@@ -172,18 +149,20 @@
           <div class="section-head compact">
             <div>
               <span class="eyebrow">Comparativo</span>
-              <h2>Ranking de corretores</h2>
+              <h2>Ranking de comissÃ£o</h2>
             </div>
           </div>
-          <p class="section-subtitle">Leitura rápida do volume, das vendas e da eficiência de conversão em toda a equipe.</p>
+          <p class="section-subtitle">Comissão por corretor com contexto de vendas e conversão.</p>
           <div class="table-shell">
             <table class="owner-ranking-table">
               <thead>
                 <tr>
                   <th>Corretor</th>
+                  <th>Comissão total</th>
                   <th>Total leads</th>
                   <th>Vendas</th>
                   <th>Conversão</th>
+                  <th>Comissão média</th>
                   <th>Ticket médio</th>
                 </tr>
               </thead>
@@ -202,7 +181,7 @@
             </div>
             <div id="originHighlight" class="section-chip mono">--</div>
           </div>
-          <p class="section-subtitle">Mix de canais para entender onde a carteira está sendo abastecida e quais origens concentram mais volume.</p>
+          <p class="section-subtitle">Canais que mais abastecem a carteira.</p>
           <div class="panel-surface">
             <div class="chart-wrap">
               <canvas id="origemChart"></canvas>
@@ -218,7 +197,7 @@
             </div>
             <div id="monthHighlight" class="section-chip mono">--</div>
           </div>
-          <p class="section-subtitle">Evolução do volume ao longo do tempo para leitura de cadência comercial e aceleração de entrada.</p>
+          <p class="section-subtitle">Cadência de entrada ao longo do tempo.</p>
           <div class="panel-surface">
             <div class="chart-wrap">
               <canvas id="mesChart"></canvas>
@@ -235,7 +214,7 @@
           </div>
           <div id="statusHighlight" class="section-chip mono">--</div>
         </div>
-        <p class="section-subtitle">Distribuição das situações registradas no contato para facilitar leitura de maturidade e pendências do relacionamento comercial.</p>
+        <p class="section-subtitle">Maturidade dos contatos e pontos de atenção.</p>
         <div class="panel-surface">
           <div class="chart-wrap">
             <canvas id="statusChart"></canvas>
@@ -248,7 +227,7 @@
           <div>
             <span class="eyebrow">Operação detalhada</span>
             <h2>Tabela de leads</h2>
-            <p class="section-subtitle">Um CRM mais legível para varrer a carteira, aplicar filtros, identificar calor de oportunidade e localizar rapidamente os casos prioritários.</p>
+            <p class="section-subtitle">Filtre a carteira e localize prioridades com rapidez.</p>
           </div>
           <div class="table-summary">
             <article>
@@ -354,8 +333,12 @@
     const corretorFilterWrap = document.getElementById("corretorFilterWrap");
     const isOwnerView = view === "owner";
 
-    const fmtMoeda = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    const fmtMoeda = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
     const fmtNumber = (n) => Number(n || 0).toLocaleString("pt-BR");
+    const fmtPercent = (n, digits = 1) => `${Number(n || 0).toLocaleString("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    })}%`;
     const formatDateTime = (value) => new Date(value).toLocaleString("pt-BR", {
       dateStyle: "short",
       timeStyle: "short"
@@ -384,14 +367,9 @@
     const content = document.getElementById("dashboardContent");
     const badge = document.getElementById("corretorBadge");
     const updatedAt = document.getElementById("updatedAt");
-    const heroUpdatedAt = document.getElementById("heroUpdatedAt");
     const heroTitle = document.getElementById("heroTitle");
     const heroSubtitle = document.getElementById("heroSubtitle");
     const heroHighlights = document.getElementById("heroHighlights");
-    const heroSpotlightValue = document.getElementById("heroSpotlightValue");
-    const heroSpotlightText = document.getElementById("heroSpotlightText");
-    const heroLeadCount = document.getElementById("heroLeadCount");
-    const heroMomentum = document.getElementById("heroMomentum");
     const primaryCluster = document.getElementById("primaryCluster");
     const funnelSummary = document.getElementById("funnelSummary");
     const funnelFocus = document.getElementById("funnelFocus");
@@ -427,10 +405,14 @@
       const propostas = dados.filter((lead) => temProposta(lead)).length;
       const vendas = dados.filter((lead) => isSim(lead.teveVenda));
       const perdidos = dados.filter((lead) => isNao(lead.teveVenda)).length;
+      const valorVendas = vendas.reduce((sum, lead) => sum + Number(lead.valorImovel || 0), 0);
+      const comissaoTotal = dados.reduce((sum, lead) => sum + Number(lead.comissao || 0), 0);
       const ticket = vendas.length ? vendas.reduce((sum, lead) => sum + lead.valorImovel, 0) / vendas.length : 0;
       const taxaPerda = total ? Number(((perdidos / total) * 100).toFixed(1)) : 0;
       const taxaVenda = total ? Number(((vendas.length / total) * 100).toFixed(1)) : 0;
       const carteira = dados.reduce((sum, lead) => sum + Number(lead.valorImovel || 0), 0);
+      const comissaoMedia = vendas.length ? comissaoTotal / vendas.length : 0;
+      const taxaComissao = valorVendas ? Number(((comissaoTotal / valorVendas) * 100).toFixed(2)) : 0;
 
       return {
         total,
@@ -442,7 +424,11 @@
         ticket,
         taxaPerda,
         taxaVenda,
-        carteira
+        carteira,
+        valorVendas,
+        comissaoTotal,
+        comissaoMedia,
+        taxaComissao
       };
     };
 
@@ -477,41 +463,59 @@
       const momentum = dominantStatus(dados);
       const funnelSummaryData = summarizeFunnel(funnel);
       const valorPotencial = kpis.carteira > 0 ? fmtMoeda(kpis.carteira) : "Sem valor";
+      const comissaoTotal = kpis.comissaoTotal > 0 ? fmtMoeda(kpis.comissaoTotal) : "Sem comissão";
+      const termometroTexto = kpis.vendas > 0
+        ? `${fmtNumber(kpis.vendas)} fechamento(s) em ${fmtNumber(kpis.total)} leads.`
+        : `Sem vendas no recorte. Gargalo: ${funnelSummaryData.weakest.label.toLowerCase()}.`;
 
       heroTitle.textContent = ownerMode
         ? "Panorama executivo da operação comercial"
         : `Panorama comercial de ${corretor}`;
 
       heroSubtitle.textContent = ownerMode
-        ? "Visão consolidada da equipe com leitura de volume, conversão, gargalos e prioridades que pedem ação da gestão."
-        : "Acompanhamento direto da carteira individual com visão clara do funil, do ritmo de atendimento e dos próximos movimentos.";
-
-      heroUpdatedAt.textContent = formatDateTime(payload.atualizadoEm);
-      heroLeadCount.textContent = fmtNumber(kpis.total);
-      heroMomentum.textContent = momentum;
-      heroSpotlightValue.textContent = `${kpis.taxaVenda.toLocaleString("pt-BR")}%`;
-      heroSpotlightText.textContent = kpis.vendas > 0
-        ? `${fmtNumber(kpis.vendas)} fechamento(s) confirmados em ${fmtNumber(kpis.total)} leads, com gargalo principal em ${funnelSummaryData.weakest.label.toLowerCase()}.`
-        : `Nenhuma venda fechada no recorte atual. O ponto mais sensível está em ${funnelSummaryData.weakest.label.toLowerCase()}.`;
+        ? "Visão consolidada de volume, conversão, comissão e gargalos."
+        : "Visão da carteira com funil, vendas e comissão.";
 
       heroHighlights.innerHTML = [
         {
+          label: "Termômetro comercial",
+          value: fmtPercent(kpis.taxaVenda),
+          description: `${termometroTexto} Comissão: ${comissaoTotal}.`,
+          className: "hero-highlight--wide hero-highlight--spotlight"
+        },
+        {
           label: ownerMode ? "Carteira consolidada" : "Carteira sob gestão",
           value: fmtNumber(kpis.total),
-          description: ownerMode ? "leads distribuídos entre a equipe no recorte atual." : "leads acompanhados no recorte selecionado."
+          description: ownerMode ? "leads no recorte atual." : "leads no recorte atual."
+        },
+        {
+          label: "Leads ativos",
+          value: fmtNumber(kpis.total),
+          description: "volume ativo no recorte."
+        },
+        {
+          label: "Etapa dominante",
+          value: momentum,
+          description: "etapa com maior concentração."
         },
         {
           label: "Volume potencial",
           value: valorPotencial,
-          description: "soma do valor dos imóveis presentes na carteira visível."
+          description: "valor dos imóveis visíveis.",
+          className: "hero-highlight--wide"
+        },
+        {
+          label: "Comissão total",
+          value: comissaoTotal,
+          description: ownerMode ? "comissão no filtro atual." : "comissão da carteira atual."
         },
         {
           label: "Melhor passagem",
           value: `${funnelSummaryData.strongest.rate}%`,
-          description: `${funnelSummaryData.strongest.label} é a transição mais eficiente agora.`
+          description: `${funnelSummaryData.strongest.label} mais eficiente.`
         }
       ].map((item) => `
-        <article class="hero-highlight">
+        <article class="hero-highlight ${item.className || ""}">
           <span>${item.label}</span>
           <strong class="mono">${item.value}</strong>
           <p>${item.description}</p>
@@ -521,14 +525,17 @@
 
     const drawKpis = (kpis) => {
       const cards = [
-        { label: "Total de leads", value: fmtNumber(kpis.total), meta: "volume total da carteira ativa neste recorte.", icon: "ph-users-three", variant: "kpi--hero" },
-        { label: "Contatos realizados", value: fmtNumber(kpis.contatos), meta: "leads já abordados pelo time.", icon: "ph-chat-circle-text", variant: "kpi--compact" },
-        { label: "Visitas realizadas", value: fmtNumber(kpis.visitas), meta: "agendamentos convertidos em visita.", icon: "ph-house-line", variant: "kpi--standard" },
-        { label: "Propostas enviadas", value: fmtNumber(kpis.propostas), meta: "negociações formalizadas até aqui.", icon: "ph-scroll", variant: "kpi--standard" },
-        { label: "Vendas fechadas", value: fmtNumber(kpis.vendas), meta: "fechamentos confirmados neste painel.", icon: "ph-seal-check", variant: "kpi--standard" },
-        { label: "Leads perdidos", value: fmtNumber(kpis.perdidos), meta: "casos marcados como perdidos.", icon: "ph-warning-octagon", variant: "kpi--standard" },
-        { label: "Ticket médio", value: fmtMoeda(kpis.ticket), meta: "valor médio dos imóveis vendidos.", icon: "ph-currency-circle-dollar", variant: "kpi--standard" },
-        { label: "Taxa de perda", value: `${kpis.taxaPerda.toLocaleString("pt-BR")}%`, meta: "percentual da carteira que saiu do funil.", icon: "ph-chart-line-down", variant: "kpi--standard" }
+        { label: "Total de leads", value: fmtNumber(kpis.total), meta: "carteira ativa no recorte.", icon: "ph-users-three", variant: "kpi--hero" },
+        { label: "Contatos realizados", value: fmtNumber(kpis.contatos), meta: "leads já atendidos.", icon: "ph-chat-circle-text", variant: "kpi--compact" },
+        { label: "Visitas realizadas", value: fmtNumber(kpis.visitas), meta: "leads que viraram visita.", icon: "ph-house-line", variant: "kpi--standard" },
+        { label: "Propostas enviadas", value: fmtNumber(kpis.propostas), meta: "negociações formalizadas.", icon: "ph-scroll", variant: "kpi--standard" },
+        { label: "Vendas fechadas", value: fmtNumber(kpis.vendas), meta: "fechamentos no recorte.", icon: "ph-seal-check", variant: "kpi--standard" },
+        { label: "Comissão total", value: fmtMoeda(kpis.comissaoTotal), meta: "comissão acumulada no recorte.", icon: "ph-hand-coins", variant: "kpi--standard" },
+        { label: "Comissão média", value: fmtMoeda(kpis.comissaoMedia), meta: "média por venda.", icon: "ph-coins", variant: "kpi--compact" },
+        { label: "Leads perdidos", value: fmtNumber(kpis.perdidos), meta: "oportunidades encerradas.", icon: "ph-warning-octagon", variant: "kpi--standard" },
+        { label: "Ticket médio", value: fmtMoeda(kpis.ticket), meta: "valor médio por venda.", icon: "ph-currency-circle-dollar", variant: "kpi--standard" },
+        { label: "Taxa de comissão", value: fmtPercent(kpis.taxaComissao, 2), meta: "comissão sobre o valor vendido.", icon: "ph-percent", variant: "kpi--standard" },
+        { label: "Taxa de perda", value: fmtPercent(kpis.taxaPerda), meta: "parcela fora do funil.", icon: "ph-chart-line-down", variant: "kpi--standard" }
       ];
 
       kpiGrid.innerHTML = cards.map((item, index) => `
@@ -600,9 +607,14 @@
 
       const ok = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
       const dados = ok.flatMap((result) => result.dados);
+      const atualizadoEm = ok
+        .map((result) => new Date(result.payload.atualizadoEm).getTime())
+        .filter((value) => Number.isFinite(value))
+        .sort((a, b) => b - a)[0];
+
       return {
         corretor: "Relatório Geral",
-        atualizadoEm: new Date().toISOString(),
+        atualizadoEm: atualizadoEm ? new Date(atualizadoEm).toISOString() : new Date().toISOString(),
         dados
       };
     };
@@ -630,16 +642,20 @@
     const drawOwnerSummary = (dados) => {
       const corretoresAtivos = new Set(dados.map((lead) => lead.corretor).filter(Boolean)).size;
       const vendas = dados.filter((lead) => isSim(lead.teveVenda)).length;
-      const taxaVenda = dados.length ? ((vendas / dados.length) * 100).toFixed(1) : "0.0";
+      const taxaVenda = dados.length ? (vendas / dados.length) * 100 : 0;
       const ticketVals = dados.filter((lead) => isSim(lead.teveVenda) && lead.valorImovel > 0).map((lead) => lead.valorImovel);
       const ticketMedio = ticketVals.length ? ticketVals.reduce((a, b) => a + b, 0) / ticketVals.length : 0;
-      const mediaLeads = corretoresAtivos ? (dados.length / corretoresAtivos).toFixed(1) : "0.0";
+      const mediaLeads = corretoresAtivos ? dados.length / corretoresAtivos : 0;
+      const comissaoTotal = dados.reduce((sum, lead) => sum + Number(lead.comissao || 0), 0);
+      const comissaoMediaCorretor = corretoresAtivos ? comissaoTotal / corretoresAtivos : 0;
 
       ownerSummary.innerHTML = [
         ["Corretores ativos", corretoresAtivos],
-        ["Leads por corretor", mediaLeads],
-        ["Taxa geral de venda", `${taxaVenda}%`],
-        ["Ticket médio geral", fmtMoeda(ticketMedio)]
+        ["Leads por corretor", Number(mediaLeads || 0).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })],
+        ["Conversão geral", fmtPercent(taxaVenda)],
+        ["Ticket médio", fmtMoeda(ticketMedio)],
+        ["Comissão total", fmtMoeda(comissaoTotal)],
+        ["Comissão média", fmtMoeda(comissaoMediaCorretor)]
       ].map(([label, value]) => `
         <article class="owner-summary-card">
           <div class="label">${label}</div>
@@ -650,9 +666,10 @@
 
     const drawOwnerRanking = (dados) => {
       const grouped = dados.reduce((acc, lead) => {
-        const key = lead.corretor || "Nao informado";
-        if (!acc[key]) acc[key] = { leads: 0, vendas: 0, valorVendas: 0 };
+        const key = lead.corretor || "Não informado";
+        if (!acc[key]) acc[key] = { leads: 0, vendas: 0, valorVendas: 0, comissao: 0 };
         acc[key].leads += 1;
+        acc[key].comissao += Number(lead.comissao || 0);
         if (isSim(lead.teveVenda)) {
           acc[key].vendas += 1;
           acc[key].valorVendas += Number(lead.valorImovel || 0);
@@ -664,16 +681,33 @@
         .map(([nome, data]) => {
           const conv = data.leads ? ((data.vendas / data.leads) * 100) : 0;
           const ticket = data.vendas ? data.valorVendas / data.vendas : 0;
-          return { nome, leads: data.leads, vendas: data.vendas, conv, ticket };
+          const comissaoMedia = data.vendas ? data.comissao / data.vendas : 0;
+          return { nome, leads: data.leads, vendas: data.vendas, conv, ticket, comissao: data.comissao, comissaoMedia };
         })
-        .sort((a, b) => b.vendas - a.vendas || b.conv - a.conv);
+        .sort((a, b) => b.comissao - a.comissao || b.vendas - a.vendas || b.conv - a.conv);
 
-      ownerRankingBody.innerHTML = rows.map((row) => `
-        <tr>
-          <td>${row.nome}</td>
+      if (!rows.length) {
+        ownerRankingBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="owner-ranking-empty">Nenhum corretor no filtro atual.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      ownerRankingBody.innerHTML = rows.map((row, index) => `
+        <tr class="${index < 3 ? `owner-ranking-row owner-ranking-row--top-${index + 1}` : ""}">
+          <td>
+            <div class="owner-ranking-broker">
+              <strong>${row.nome}</strong>
+              ${index < 3 ? `<span class="owner-ranking-badge">Top ${index + 1}</span>` : `<span class="owner-ranking-badge owner-ranking-badge--muted">Posição ${index + 1}</span>`}
+            </div>
+          </td>
+          <td class="mono">${fmtMoeda(row.comissao)}</td>
           <td class="mono">${fmtNumber(row.leads)}</td>
           <td class="mono">${fmtNumber(row.vendas)}</td>
           <td class="mono">${row.conv.toFixed(1)}%</td>
+          <td class="mono">${fmtMoeda(row.comissaoMedia)}</td>
           <td class="mono">${fmtMoeda(row.ticket)}</td>
         </tr>
       `).join("");
@@ -744,7 +778,10 @@
           primaryCluster.classList.add("cluster-primary--single");
         }
 
-        updatedAt.textContent = `Atualizado: ${formatDateTime(payload.atualizadoEm)}`;
+        updatedAt.innerHTML = `
+          <span>Última atualização</span>
+          <strong class="mono">${formatDateTime(payload.atualizadoEm)}</strong>
+        `;
         stateBox.hidden = true;
         content.hidden = false;
 

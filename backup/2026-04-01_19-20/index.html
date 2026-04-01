@@ -84,51 +84,10 @@
           </div>
           <input id="brokerPasswordInput" type="password" class="form-control input" placeholder="Senha de acesso" />
           <div id="passwordError" class="auth-notice d-none mt-2">Senha inválida. Tente novamente.</div>
-          <div id="passwordSuccess" class="auth-notice auth-notice--success d-none mt-2">Senha alterada com sucesso. Use a nova senha no próximo acesso.</div>
         </div>
         <div class="modal-footer">
-          <button id="openChangePasswordBtn" type="button" class="btn btn-outline-accent me-auto" hidden>Alterar senha</button>
           <button type="button" class="btn btn-outline-accent" data-bs-dismiss="modal">Cancelar</button>
           <button id="confirmPasswordBtn" type="button" class="btn btn-primary">Entrar no CRM</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade auth-modal" id="changePasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div>
-            <span class="eyebrow mb-0">Segurança</span>
-            <h5 class="modal-title">Alterar senha</h5>
-          </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-        </div>
-        <div class="modal-body">
-          <div class="auth-modal-meta">
-            <p class="auth-modal-copy">Defina uma nova senha para o perfil selecionado. Essa alteração poderá ser feita apenas uma vez por perfil neste navegador.</p>
-            <strong id="changePasswordBrokerName"></strong>
-          </div>
-          <div class="auth-form-stack">
-            <label class="auth-field">
-              <span>Senha atual</span>
-              <input id="currentPasswordInput" type="password" class="form-control input" placeholder="Digite a senha atual" />
-            </label>
-            <label class="auth-field">
-              <span>Nova senha</span>
-              <input id="newPasswordInput" type="password" class="form-control input" placeholder="Mínimo de 6 caracteres" />
-            </label>
-            <label class="auth-field">
-              <span>Confirmar nova senha</span>
-              <input id="confirmNewPasswordInput" type="password" class="form-control input" placeholder="Repita a nova senha" />
-            </label>
-          </div>
-          <div id="changePasswordFeedback" class="auth-notice d-none mt-2"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-accent" data-bs-dismiss="modal">Cancelar</button>
-          <button id="confirmChangePasswordBtn" type="button" class="btn btn-primary">Salvar nova senha</button>
         </div>
       </div>
     </div>
@@ -161,10 +120,6 @@
       josias: "010377"
     };
 
-    const PASSWORD_MIN_LENGTH = 6;
-    const PASSWORD_STORAGE_PREFIX = "conquist_password_override_";
-    const PASSWORD_CHANGED_PREFIX = "conquist_password_changed_";
-
     const roleCopy = {
       owner: {
         role: "Gestão"
@@ -184,39 +139,10 @@
     let selectedBroker = null;
     const modalEl = document.getElementById("passwordModal");
     const modal = new bootstrap.Modal(modalEl);
-    const changePasswordModalEl = document.getElementById("changePasswordModal");
-    const changePasswordModal = new bootstrap.Modal(changePasswordModalEl);
     const selectedBrokerName = document.getElementById("selectedBrokerName");
     const passwordInput = document.getElementById("brokerPasswordInput");
     const passwordError = document.getElementById("passwordError");
-    const passwordSuccess = document.getElementById("passwordSuccess");
     const confirmBtn = document.getElementById("confirmPasswordBtn");
-    const openChangePasswordBtn = document.getElementById("openChangePasswordBtn");
-    const changePasswordBrokerName = document.getElementById("changePasswordBrokerName");
-    const currentPasswordInput = document.getElementById("currentPasswordInput");
-    const newPasswordInput = document.getElementById("newPasswordInput");
-    const confirmNewPasswordInput = document.getElementById("confirmNewPasswordInput");
-    const confirmChangePasswordBtn = document.getElementById("confirmChangePasswordBtn");
-    const changePasswordFeedback = document.getElementById("changePasswordFeedback");
-
-    const getBrokerKey = (broker) => (broker?.nome || "").toString().trim().toLowerCase();
-    const getPasswordStorageKey = (brokerKey) => `${PASSWORD_STORAGE_PREFIX}${brokerKey}`;
-    const getPasswordChangedKey = (brokerKey) => `${PASSWORD_CHANGED_PREFIX}${brokerKey}`;
-    const getExpectedPassword = (brokerKey) => localStorage.getItem(getPasswordStorageKey(brokerKey)) || brokerPasswords[brokerKey];
-    const hasPasswordBeenChanged = (brokerKey) => localStorage.getItem(getPasswordChangedKey(brokerKey)) === "true";
-
-    const resetChangePasswordForm = () => {
-      currentPasswordInput.value = "";
-      newPasswordInput.value = "";
-      confirmNewPasswordInput.value = "";
-      changePasswordFeedback.textContent = "";
-      changePasswordFeedback.className = "auth-notice d-none mt-2";
-    };
-
-    const setChangePasswordAvailability = () => {
-      const brokerKey = getBrokerKey(selectedBroker);
-      openChangePasswordBtn.hidden = !brokerKey || hasPasswordBeenChanged(brokerKey);
-    };
 
     grid.innerHTML = brokers.map((broker, index) => {
       const copy = roleCopy[broker.role] || roleCopy.broker;
@@ -248,12 +174,8 @@
           gid: link.dataset.gid || ""
         };
         selectedBrokerName.textContent = selectedBroker.nome;
-        changePasswordBrokerName.textContent = selectedBroker.nome;
         passwordInput.value = "";
         passwordError.classList.add("d-none");
-        passwordSuccess.classList.add("d-none");
-        resetChangePasswordForm();
-        setChangePasswordAvailability();
         modal.show();
         setTimeout(() => passwordInput.focus(), 150);
       });
@@ -261,15 +183,13 @@
 
     const validateAccess = () => {
       if (!selectedBroker) return;
-      const key = getBrokerKey(selectedBroker);
-      const expected = getExpectedPassword(key);
-      const typed = passwordInput.value.trim();
+      const key = selectedBroker.nome.toLowerCase();
+      const expected = brokerPasswords[key];
+      const typed = passwordInput.value;
       if (!expected || typed !== expected) {
         passwordError.classList.remove("d-none");
-        passwordSuccess.classList.add("d-none");
         return;
       }
-      passwordError.classList.add("d-none");
       sessionStorage.setItem("conquist_auth", JSON.stringify({
         corretor: selectedBroker.nome,
         role: selectedBroker.role,
@@ -282,80 +202,9 @@
       window.location.href = `dashboard.html?corretor=${encodeURIComponent(selectedBroker.nome)}&gid=${encodeURIComponent(selectedBroker.gid)}`;
     };
 
-    const showChangePasswordFeedback = (message, type = "error") => {
-      changePasswordFeedback.textContent = message;
-      changePasswordFeedback.className = `auth-notice mt-2 ${type === "success" ? "auth-notice--success" : ""}`;
-    };
-
-    const handlePasswordChange = () => {
-      if (!selectedBroker) return;
-
-      const brokerKey = getBrokerKey(selectedBroker);
-      if (!brokerKey || hasPasswordBeenChanged(brokerKey)) {
-        showChangePasswordFeedback("Essa senha já foi alterada e não pode ser modificada novamente por aqui.");
-        openChangePasswordBtn.hidden = true;
-        return;
-      }
-
-      const currentPassword = currentPasswordInput.value.trim();
-      const newPassword = newPasswordInput.value.trim();
-      const confirmPassword = confirmNewPasswordInput.value.trim();
-      const expectedPassword = getExpectedPassword(brokerKey);
-
-      if (!expectedPassword || currentPassword !== expectedPassword) {
-        showChangePasswordFeedback("A senha atual informada é inválida.");
-        return;
-      }
-
-      if (newPassword.length < PASSWORD_MIN_LENGTH) {
-        showChangePasswordFeedback(`A nova senha deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`);
-        return;
-      }
-
-      if (newPassword !== confirmPassword) {
-        showChangePasswordFeedback("A confirmação da nova senha não confere.");
-        return;
-      }
-
-      localStorage.setItem(getPasswordStorageKey(brokerKey), newPassword);
-      localStorage.setItem(getPasswordChangedKey(brokerKey), "true");
-
-      openChangePasswordBtn.hidden = true;
-      resetChangePasswordForm();
-      changePasswordModal.hide();
-      passwordInput.value = "";
-      passwordError.classList.add("d-none");
-      passwordSuccess.classList.remove("d-none");
-      setTimeout(() => passwordInput.focus(), 150);
-    };
-
     confirmBtn.addEventListener("click", validateAccess);
     passwordInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") validateAccess();
-    });
-
-    openChangePasswordBtn.addEventListener("click", () => {
-      if (!selectedBroker) return;
-      resetChangePasswordForm();
-      changePasswordBrokerName.textContent = selectedBroker.nome;
-      modal.hide();
-      changePasswordModal.show();
-      setTimeout(() => currentPasswordInput.focus(), 150);
-    });
-
-    confirmChangePasswordBtn.addEventListener("click", handlePasswordChange);
-    [currentPasswordInput, newPasswordInput, confirmNewPasswordInput].forEach((input) => {
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") handlePasswordChange();
-      });
-    });
-
-    changePasswordModalEl.addEventListener("hidden.bs.modal", () => {
-      resetChangePasswordForm();
-      if (selectedBroker) {
-        modal.show();
-        setTimeout(() => passwordInput.focus(), 150);
-      }
     });
 
     AOS.init({

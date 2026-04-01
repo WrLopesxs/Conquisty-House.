@@ -375,10 +375,6 @@
   font-weight: 600;
 }
 
-.auth-notice--success {
-  color: var(--status-venda);
-}
-
 .system-footer {
   margin-top: 0;
   padding-top: 0.35rem;
@@ -399,24 +395,6 @@
 .auth-modal-copy {
   color: var(--text-secondary);
   line-height: 1.7;
-}
-
-.auth-form-stack {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.auth-field {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.auth-field span {
-  color: var(--text-muted);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .auth-modal-meta {
